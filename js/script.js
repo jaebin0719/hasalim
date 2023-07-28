@@ -34,6 +34,8 @@ window.onload = function () {
       NEW_GOOD = obj.newgood;
       RECOMMEND_GOOD = obj.recommendgood;
       POPULAR_ICON = obj.popularicon;
+      POPULAR_GOOD = obj.populargood;
+      BRAND_ARR = obj.brandarr;
       // 비주얼 화면에 배치한다.
       showVisual();
       // 오늘의 상품을 화면에 배치
@@ -46,6 +48,10 @@ window.onload = function () {
       showRecommendGood();
       // 인기상품 아이콘을 화면에 배치
       showPopularIconGood();
+      // 인기 물품 화면애 배치
+      showPopularGood();
+      // 브랜드관 화면에 배치
+      showBrandArr();
     }
   };
   //자료 호출
@@ -73,6 +79,13 @@ window.onload = function () {
   // 인기 물품 아이콘
   let POPULAR_ICON;
   let popularIconTag = document.getElementById("data-popular-icon");
+  // 인기 물품 화면 출력
+  let POPULAR_GOOD;
+  let popularshow = 1; //목록중 0번을 보여준다
+  let popularTag = document.getElementById("data-popular");
+  // 브랜드 목록 화면출력
+  let BRAND_ARR;
+  let brandTag = document.getElementById("data-brand");
   // -----------------------------
   // 비주얼 화면 출력 기능
   function showVisual() {
@@ -359,6 +372,111 @@ window.onload = function () {
       navigation: {
         nextEl: ".popular-slide-next",
         prevEl: ".popular-slide-prev",
+      },
+    });
+    const tag = document.querySelectorAll(".popular-slide a");
+    tag.forEach(function (item, index) {
+      // 호버 했을때 이미지가 변경
+      item.addEventListener("mouseover", function () {
+        const spanTag = this.querySelector(".popular-cate-icon");
+        spanTag.style.backgroundPositionY = "-64px";
+      });
+      // 마우스가 아웃됐을때
+      item.addEventListener("mouseout", function () {
+        const spanTag = this.querySelector(".popular-cate-icon");
+        spanTag.style.backgroundPositionY = "0";
+      });
+      // 클릭을 하면 버튼(.popular-more)의 글자를
+      // 클릭된 타이틀의 글자로 변경
+      item.addEventListener("click", function (event) {
+        // a 태그이므로 href적용된다
+        // 웹브라우저 갱신이되므로 UI를 위해 막아야한다
+        event.preventDefault();
+        const bt = document.querySelector(".popular-more");
+        const title = this.querySelector(".popular-cate-name");
+        bt.innerHTML = `${title.innerHTML} 물품 더보기`;
+        // 하단에 목록을 갱신
+        // 현재 클릭된 번호를 popularShow 에 담는다
+        popularshow = index;
+        showPopularGood();
+      });
+    });
+  }
+  // 인기 상품 화면 출력
+  function showPopularGood() {
+    let html = "";
+    let popCate = "populargood-" + (popularshow + 1);
+    console.log(POPULAR_GOOD[popCate]);
+    POPULAR_GOOD[popCate].forEach(function (item) {
+      let tag = `
+      <div class="good-box">
+      <!-- 제품이미지 -->
+      <a href="${item.link}" class="good-img">
+        <img src="images/${item.pic}" alt="${item.name}" />
+        <span class="good-type">${item.tag}</span>
+      </a>
+      <!-- 제품정보 -->
+      <a href="${item.link}" class="good-info">
+        <em>${item.name}</em>(<em>${item.unit}</em>)
+      </a>
+      <!-- 제품가격 -->
+      <a href="${item.link}" class="good-info-price">${priceToString(
+        item.price
+      )}<em>원</em></a>
+      <!-- 장바구니 -->
+      <button class="good-add-cart"></button>
+    </div>
+      `;
+      html += tag;
+    });
+    popularTag.innerHTML = html;
+  }
+  // 브랜드 목록 화면 출력
+  function showBrandArr() {
+    let html = `
+  <div class="swiper sw-brand">
+  <div class="swiper-wrapper">
+    `;
+    BRAND_ARR.forEach(function (item) {
+      let tag = `
+      <div class="swiper-slide">
+      <div class="brand-box">
+      <a href="${item.link}">
+        <img src="../images/${item.pic}" alt = " ${item.name}"/>
+          <p> ${item.name} </p>
+            <ul class="brand-info clearfix">
+              <li>
+                <span class="brand-info-title"> ${item.title1} </span>
+                <span class="brand-info-value"> ${item.value1} </span>
+              </li>
+              <li>
+                <span class="brand-info-title"> ${item.title2} </span>
+                <span class="brand-info-value"> ${item.value2} </span>
+              </li>
+            </ul>
+      
+      </a>
+
+      </div>
+      </div>
+      `;
+      html += tag;
+    });
+    html += `
+    </div>
+      </div>
+    `;
+    brandTag.innerHTML = html;
+    const swBrand = new Swiper(".sw-brand", {
+      slidesPerView: 3,
+      spaceBetween: 16,
+      navigation: {
+        prevEl: ".brand .slide-prev",
+        nextEl: ".brand .slide-next",
+      },
+      pagination: {
+        el: ".brand .slide-pg",
+        type: "fraction",
       },
     });
   }
